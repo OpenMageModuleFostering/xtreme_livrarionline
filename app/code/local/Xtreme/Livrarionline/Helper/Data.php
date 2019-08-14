@@ -23,7 +23,8 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		$name = $store->getName();
 		
 		$price = 0;
-		
+		$lo = new LO ();
+
 		$f_request_awb = array();
 		$f_request_awb['f_shipping_company_id'] = (int) $carrier->getShippingCompanyId(); // int 	obligatoriu
 		$f_request_awb['request_data_ridicare'] = '2013-11-28';  // date Y-m-d	optional
@@ -37,49 +38,49 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		$f_request_awb['referinta_expeditor'] = $awb->getReference(); // varchar(255) Obligatoriu
 		$f_request_awb['valoare_declarata'] = $awb->getDeclaredValue();	// decimal(10,2) Obligatoriu
 		$f_request_awb['ramburs'] = $awb->getCod(); // decimal(10,2) Obligatoriu
-		$f_request_awb['asigurare_la_valoarea_declarata'] = (bool) $awb->getInsurance(); // Boolean Obligatoriu
-		$f_request_awb['retur_documente'] = (bool) $awb->getReturndocs(); // boolean 	optional
-		$f_request_awb['retur_documente_bancare'] = (bool) $awb->getReturndocsbank(); // boolean	 optional
-		$f_request_awb['confirmare_livrare'] = (bool) $awb->getDeliveryconf(); // boolean	optional
-		$f_request_awb['livrare_sambata'] = (bool) $awb->getDeliverysat(); // Boolean optional
+		$f_request_awb['asigurare_la_valoarea_declarata'] = $lo->checkboxSelected($awb->getInsurance()); // Boolean Obligatoriu
+		$f_request_awb['retur_documente'] = $lo->checkboxSelected($awb->getReturndocs()); // boolean 	optional
+		$f_request_awb['retur_documente_bancare'] = $lo->checkboxSelected($awb->getReturndocsbank()); // boolean	 optional
+		$f_request_awb['confirmare_livrare'] = $lo->checkboxSelected($awb->getDeliveryconf()); // boolean	optional
+		$f_request_awb['livrare_sambata'] = $lo->checkboxSelected($awb->getDeliverysat()); // Boolean optional
 		$f_request_awb['currency'] = ($awb->getDeclaredValue() > 0) ? $awb->getCurrency() : '';  // char(3) Obligatoriu cand "valoare_declarata" > 0
-		$f_request_awb['currency_ramburs'] = ($awb->getCod() > 0) ? $awb->getCod() : ''; // char(3) Obligatoriu cand "ramburs" > 0
-		$f_request_awb['notificare_email']= (bool) $awb->getEmailnotify(); // Boolean optional
-		$f_request_awb['notificare_sms'] = (bool)  $awb->getSmsnotify(); // Boolean optional
-		$f_request_awb['cine_plateste'] = $awb->getPayee(); // 0 - merchant,2 - destinatar,1 - expeditor    Obligatoriu
+		$f_request_awb['currency_ramburs'] = ($awb->getCod() > 0) ? $awb->getCurrency() : ''; // char(3) Obligatoriu cand "ramburs" > 0
+		$f_request_awb['notificare_email']= $lo->checkboxSelected($awb->getEmailnotify()); // Boolean optional
+		$f_request_awb['notificare_sms'] = $lo->checkboxSelected($awb->getSmsnotify()); // Boolean optional
+		$f_request_awb['cine_plateste'] = (int) $awb->getPayee(); // 0 - merchant,2 - destinatar,1 - expeditor    Obligatoriu
 		$f_request_awb['serviciuid']= (int) $carrier->getServiceId();	 // int Obligatoriu
-		$f_request_awb['request_mpod'] = false; // Boolean optional
+		$f_request_awb['request_mpod'] = $lo->checkboxSelected($awb->getDeliveryconfmerchant()); // Boolean optional
 
 		$colete = array();
 		foreach($parcels as $item)
 		{
 			$colete[] = array(
 				'greutate'=> (float) (($item->getWeight() > 0) ? $item->getWeight() : 1), // decimal 10,2 kg
-				'lungime'=> ($item->getLength() > 0) ? $item->getLength() : 1, // integer      cm
-				'latime'=> ($item->getWidth() > 0) ? $item->getWidth() : 1, // integer      cm
-				'inaltime'=> ($item->getHeight() > 0) ? $item->getHeight() : 1, // integer      cm
-				'continut'=> $item->getContent(), // int      1;"Acte" 2;"Tipizate" 3;"Fragile" 4;"Generale"
-				'tipcolet'=> $item->getParcelType() // int 1;"Plic"2;"Colet"3;"Palet"11
+				'lungime'=> (float)(($item->getLength() > 0) ? $item->getLength() : 1), // integer      cm
+				'latime'=> (float)(($item->getWidth() > 0) ? $item->getWidth() : 1), // integer      cm
+				'inaltime'=> (float)(($item->getHeight() > 0) ? $item->getHeight() : 1), // integer      cm
+				'continut'=> (int)$item->getContent(), // int      1;"Acte" 2;"Tipizate" 3;"Fragile" 4;"Generale"
+				'tipcolet'=> (int)$item->getParcelType() // int 1;"Plic"2;"Colet"3;"Palet"11
 			);
 		}
 
 		$f_request_awb['colete'] = $colete;
 
 		$f_request_awb['destinatar'] = array(
-			'first_name' => $billing->getFirstname(), //Obligatoriu
-			'last_name'=> $billing->getLastname(), //Obligatoriu
-			'email' => $billing->getEmail(),	//Obligatoriu
-			'phone' => $billing->getTelephone(), //phone sau mobile Obligatoriu
+			'first_name' => ($shipping->getFirstname()) ? $shipping->getFirstname() : $billing->getFirstname(), //Obligatoriu
+			'last_name'=> ($shipping->getLastname()) ? $shipping->getLastname() : $billing->getLastname(), //Obligatoriu
+			'email' => ($shipping->getEmail()) ? $shipping->getEmail() : $billing->getEmail(),	//Obligatoriu
+			'phone' => ($shipping->getTelephone()) ? $shipping->getTelephone() : $billing->getTelephone(), //phone sau mobile Obligatoriu
 			'mobile' => '',
 			'lang' => 'ro', //Obligatoriu ro/en
-			'company_name' => ($billing->getCompany()) ? $billing->getCompany() : '', //optional
+			'company_name' => ($shipping->getCompany()) ? $shipping->getCompany() : $billing->getCompany(), //optional
 			'j' => '', //optional
-			'bank_account' => '', //optional
-			'bank_name' => '', //optional
-			'cui' => ''//optional
+			'bank_account' => ($shipping->getIban()) ? $shipping->getIban() : $billing->getIban(), //optional
+			'bank_name' => ($shipping->getBanca()) ? $shipping->getBanca() : $billing->getBanca(), //optional
+			'cui' => ($shipping->getCif()) ? $shipping->getCif() : $billing->getCif()//optional
 		);
 		
-		//$region = Mage::getModel('directory/region')->load($shipping->getRegionId());
+		$region = Mage::getModel('directory/region')->load($shipping->getRegionId());
 		$country = Mage::getModel('directory/country')->loadByCode($shipping->getCountryId());
 		//$street = explode("\n", $shipping->getStreet());
 		$street = $shipping->getStreet();
@@ -87,13 +88,13 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 			//Obligatoriu
 			'address1' => $street[0],
 			'address2' => (count($street) == 2) ? $street[1] : '',
-			'city' => iconv("UTF-8", "ISO-8859-1//TRANSLIT", $shipping->getCity()),
+			'city' => $shipping->getCity(),
 			//'state'	=> iconv("UTF-8", "ISO-8859-1//TRANSLIT", $region->getName()),
-			'state' => "Bucuresti",
+			'state' => $region->getName(),
 			'zip' => $shipping->getPostcode(),
-			'country' => iconv("UTF-8", "ISO-8859-1//TRANSLIT", $country->getName()),
+			'country' => $country->getName(),
 			'phone' => $shipping->getTelephone(),
-			'observatii'=> 'Observatii de test'
+			'observatii'=> ''
 		);
 
 		//$region = Mage::getModel('directory/region')->load($request->getRegionId());
@@ -103,7 +104,7 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		{
 			$region = Mage::getModel('directory/region')->loadByCode($lo_store->getState(), $lo_store->getCountry())->getName();
 			$country = Mage::getModel('directory/country')->loadByCode($lo_store->getCountry());
-			$country = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $country->getName());
+			$country = $country->getName();
 		}
 		$f_request_awb['shipFROMaddress'] = array(
 			'email'			=> $lo_store->getEmail(),
@@ -111,25 +112,23 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 			'last_name' 	=> $lo_store->getLastname(),		
 			'mobile'	 	=> '',
 			'main_address' 	=> $lo_store->getAddress1(),
-			'city' 			=> iconv("UTF-8", "ISO-8859-1//TRANSLIT", $lo_store->getCity()),
+			'city' 			=> $lo_store->getCity(),
 			'state' 		=> $region,
 			'zip' 			=> $lo_store->getZipcode(),
 			'country' 		=> $country,
 			'phone'			=> $lo_store->getPhone(),
 			'instructiuni'	=> ''	
 		);
-		
-		//print_r($f_request_awb);exit;
+		//echo '<pre>';
+		//var_dump($f_request_awb);exit;
 
-		Mage::log(var_export($f_request_awb, true));
-		
-		$lo = new LO ();
+		//Mage::log(var_export($f_request_awb, true));
 		
 		$lo->f_login = $login_id;
 		$lo->setRSAKey($security_key);
 				
 		$response_awb = $lo->GenerateAwb($f_request_awb);
-		Mage::log($response_awb);
+		//Mage::log($response_awb);
 		
 		//raspuns generare AWB
 		if ((isset($response_awb->status) && $response_awb->status == 'error') || empty($response_awb))
@@ -203,7 +202,7 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		foreach ($cartItems as $item)
 		{
 			$colete[] = array(
-				'greutate'	=> (float) (($item->getWeight() > 0) ? $item->getWeight() : 1), // decimal 10,2 kg
+				'greutate'	=> 1, // decimal 10,2 kg
 				'lungime'	=> ($item->getLength() > 0) ? $item->getLength() : 1, // integer      cm
 				'latime'	=> ($item->getWidth() > 0) ? $item->getWidth() : 1, // integer      cm
 				'inaltime'	=> ($item->getHeight() > 0) ? $item->getHeight() : 1, // integer      cm
@@ -214,14 +213,16 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 
 		$f_request_awb['colete'] = $colete;
 		
+		$shipping = $quote->getShippingAddress();
+
 		$f_request_awb['destinatar'] = array(
-			'first_name' => $billing->getFirstname(), //Obligatoriu
-			'last_name'=> $billing->getLastname(), //Obligatoriu
-			'email' => $billing->getEmail(),	//Obligatoriu
-			'phone' => $billing->getTelephone(), //phone sau mobile Obligatoriu
+			'first_name' => ($shipping->getFirstname()) ? $shipping->getFirstname() : $billing->getFirstname(), //Obligatoriu
+			'last_name'=> ($shipping->getLastname()) ? $shipping->getLastname() : $billing->getLastname(), //Obligatoriu
+			'email' => ($shipping->getEmail()) ? $shipping->getEmail() : $billing->getEmail(),	//Obligatoriu
+			'phone' => ($shipping->getTelephone()) ? $shipping->getTelephone() : $billing->getTelephone(), //phone sau mobile Obligatoriu
 			'mobile' => '',
 			'lang' => 'ro', //Obligatoriu ro/en
-			'company_name' => ($billing->getCompany()) ? $billing->getCompany() : '', //optional
+			'company_name' => '', //optional
 			'j' => '', //optional
 			'bank_account' => '', //optional
 			'bank_name' => '', //optional
@@ -236,13 +237,13 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 			//Obligatoriu
 			'address1' => $street[0],
 			'address2' => (count($street) == 2) ? $street[1] : '',
-			'city' => iconv("UTF-8", "ISO-8859-1//TRANSLIT", $shipping->getCity()),
-			'state'	=> iconv("UTF-8", "ISO-8859-16//TRANSLIT", $region->getName()),
-			'state'	=> self::toLatin1($region->getName()),
+			'city' => $shipping->getCity(),
+			'state'	=> $region->getName(),
+			//'state'	=> self::toLatin1($region->getName()),
 			'zip' => $shipping->getPostcode(),
-			'country' => iconv("UTF-8", "ISO-8859-1//TRANSLIT", $country->getName()),
+			'country' => $country->getName(),
 			'phone' => $shipping->getTelephone(),
-			'observatii'=> 'Observatii de test'
+			'observatii'=> ''
 		);
 
 		$region = $country = '';
@@ -250,15 +251,15 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		{
 			$region = Mage::getModel('directory/region')->loadByCode($default_store->getState(), $default_store->getCountry())->getName();
 			$country = Mage::getModel('directory/country')->loadByCode($default_store->getCountry());
-			$country = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $country->getName());
+			$country = $country->getName();
 		}
 		$f_request_awb['shipFROMaddress'] = array(
-			'email'			=> Mage::getStoreConfig('carriers/livrarionline/shipfrom_email'),
-			'first_name'	=> Mage::getStoreConfig('carriers/livrarionline/shipfrom_firstname'),
-			'last_name' 	=> Mage::getStoreConfig('carriers/livrarionline/shipfrom_lastname'),		
+			'email'			=> $default_store->getEmail(),
+			'first_name'	=> $default_store->getFirstname(),
+			'last_name' 	=> $default_store->getLastname(),				
 			'mobile'	 	=> '',
 			'main_address' 	=> $default_store->getAddress1(),
-			'city' 			=> iconv("UTF-8", "ISO-8859-1//TRANSLIT", $default_store->getCity()),
+			'city' 			=> $default_store->getCity(),
 			'state' 		=> $region,
 			'zip' 			=> $default_store->getZipcode(),
 			'country' 		=> $country,
@@ -276,7 +277,7 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		$lo->setRSAKey($security_key);
 				
 		$response_awb = $lo->EstimeazaPret($f_request_awb);
-		Mage::log($response_awb);
+		//Mage::log($response_awb);
 		
 		//raspuns generare AWB
 		if ((isset($response_awb->status) && $response_awb->status == 'error') || empty($response_awb))
@@ -318,7 +319,7 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		$lo->setRSAKey($security_key);
 				
 		$response_cancel = $lo->CancelLivrare($f_request_cancel);
-		Mage::log($response_cancel);
+		//Mage::log($response_cancel);
 		
 		//raspuns generare AWB
 		if ((isset($response_cancel->status) && $response_cancel->status == 'error') || empty($response_cancel))
@@ -346,7 +347,7 @@ class Xtreme_Livrarionline_Helper_Data extends Mage_Core_Helper_Abstract
 		$lo->setRSAKey($security_key);
 				
 		$response = $lo->Tracking($f_request_cancel);
-		Mage::log($response);
+		//Mage::log($response);
 				
 		//raspuns generare AWB
 		if ((isset($response->status) && $response->status == 'error') || empty($response))

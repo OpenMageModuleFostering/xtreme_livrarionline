@@ -156,18 +156,12 @@ class Xtreme_Livrarionline_Adminhtml_ManageawbController extends Mage_Adminhtml_
 	public function printAction() {
 		if( $this->getRequest()->getParam('id') > 0 ) {
 			try {			
-				$model = Mage::getModel('livrarionline/awb')->load($this->getRequest()->getParam('id'));			
-				if($model->getAwbNo())
-				{
+				$model = Mage::getModel('livrarionline/awb')->load($this->getRequest()->getParam('id'));	
+				
 					$html = Mage::helper('livrarionline')->printAWB($model->getAwbId());
 					echo $html;
 					exit;
-				}
-				else
-				{
-					echo "Missing AWB No";
-					exit;
-				}								
+											
 				//Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('adminhtml')->__($msg));
 				//$this->_redirect('*/*/');
 			} catch (Exception $e) {

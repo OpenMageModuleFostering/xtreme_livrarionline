@@ -111,8 +111,8 @@ class Xtreme_Livrarionline_Block_Adminhtml_Managestores_Edit_Tab_Form extends Ma
 
 		$fieldset->addField('phone', 'text', array(
 			'label'     => Mage::helper('livrarionline')->__('Phone'),
-			//'class'     => 'required-entry',
-			'required'  => false,
+			'class'     => 'required-entry',
+			'required'  => true,
 			'name'      => 'phone',
 		));
 

@@ -29,11 +29,25 @@ class Xtreme_Livrarionline_Block_Adminhtml_Managecarriers_Edit_Tab_Form extends 
 			'name'      => 'shipping_company_id',
 		));
 
-		/*$fieldset->addField('filename', 'file', array(
-		  'label'     => Mage::helper('livrarionline')->__('File'),
-		  'required'  => false,
-		  'name'      => 'filename',
-		));*/
+		$fieldset->addField('flat_fee', 'text', array(
+			'label'     => Mage::helper('livrarionline')->__('Flat Fee'),
+			'required'  => true,
+			'name'      => 'flat_fee',
+			'note'	    => Mage::helper('livrarionline')->__('Any negative number if you don\'t want to use quotation module (eg: -1)'),
+			'value' 	=> -1.00
+		));
+
+		$states = Mage::getModel('directory/country')->load('RO')->getRegions()->toOptionArray();
+		array_shift($states);
+		$fieldset->addField('applicable_states', 'multiselect', array(
+			'label'    => Mage::helper('livrarionline')->__('Applicable to the following states'),
+			'class'    => 'required-entry',
+			'required' => true,
+			'name'     => 'applicable_states',
+			'values'   => $states,
+			'note'	   => Mage::helper('livrarionline')->__('CTRL + click for multiple select')
+        ));
+
 		$fieldset->addField('status', 'select', array(
 		  'label'     => Mage::helper('livrarionline')->__('Status'),
 		  'name'      => 'status',
@@ -49,16 +63,6 @@ class Xtreme_Livrarionline_Block_Adminhtml_Managecarriers_Edit_Tab_Form extends 
 			  ),
 		  ),
 		));
-
-		/*$fieldset->addField('description', 'editor', array(
-		  'name'      => 'description',
-		  'label'     => Mage::helper('livrarionline')->__('Description'),
-		  'title'     => Mage::helper('livrarionline')->__('Description'),
-		  'style'     => 'width:300px; height:100px;',
-		  'wysiwyg'   => false,
-		  'required'  => true,
-		));*/
-
 
 		if ( Mage::getSingleton('adminhtml/session')->getCarrierData() )
 		{

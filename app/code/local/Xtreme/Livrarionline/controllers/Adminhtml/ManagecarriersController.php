@@ -22,6 +22,7 @@ class Xtreme_Livrarionline_Adminhtml_ManagecarriersController extends Mage_Admin
 
 		if ($model->getId() || $id == 0) {
 			$data = Mage::getSingleton('adminhtml/session')->getFormData(true);
+			
 			if (!empty($data)) {
 				$model->setData($data);
 			}
@@ -79,7 +80,7 @@ class Xtreme_Livrarionline_Adminhtml_ManagecarriersController extends Mage_Admin
     		    		//this way the name is saved in DB
 	  			$data['filename'] = $_FILES['filename']['name'];
 			}*/
-			
+			$data['applicable_states'] = implode(',',$data['applicable_states']);
 			$model = Mage::getModel('livrarionline/carriers');
 			$model->setData($data)
 				->setId($this->getRequest()->getParam('id'));

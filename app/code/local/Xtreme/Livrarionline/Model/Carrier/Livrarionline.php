@@ -16,20 +16,30 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$handling = Mage::getStoreConfig('carriers/'.$this->_code.'/handling');
 		$result = Mage::getModel('shipping/rate_result');
 		$show = true;
-		$carriers = Mage::getModel('livrarionline/carriers')->getCollection();
+		$carriers = Mage::getModel('livrarionline/carriers')->getCollection()->addFieldToFilter('`status`', 1);
 		foreach($carriers as $carrier)
 		{
-			$price_res = Mage::helper('livrarionline')->getEstimate($carrier, $quote);
+			$flat_fee = $carrier->getFlatFee(); //preiau valoarea flat fee
+			$shippingStateConfig = explode(',',  $carrier->getApplicableStates()); // preiau judetele pe care se aplica serviciul
+			$destState = $request->getDestRegionId(); // preiau judetul destinatie
 
-			if($price_res){
-				$method = Mage::getModel('shipping/rate_result_method');
-				$method->setCarrier($this->_code);
-				$method->setMethod($this->_code."_".$carrier->getCarrierId());
-				$method->setCarrierTitle(Mage::getStoreConfig('carriers/'.$this->_code.'/title'));
-				$method->setMethodTitle($carrier->getName());
-				$method->setPrice($price_res);
-				$method->setCost($price_res);
-				$result->append($method);
+			if (in_array($destState, $shippingStateConfig)) {
+				if ($flat_fee && $flat_fee>=0) {
+					$price_res = $flat_fee; //daca avem flat fee setat
+				} else {
+					$price_res = Mage::helper('livrarionline')->getEstimate($carrier, $quote);
+				}
+
+				if($price_res){
+					$method = Mage::getModel('shipping/rate_result_method');
+					$method->setCarrier($this->_code);
+					$method->setMethod($this->_code."_".$carrier->getCarrierId());
+					$method->setCarrierTitle(Mage::getStoreConfig('carriers/'.$this->_code.'/title'));
+					$method->setMethodTitle($carrier->getName());
+					$method->setPrice($price_res);
+					$method->setCost($price_res);
+					$result->append($method);
+				}
 			}
 			/*else
 			{

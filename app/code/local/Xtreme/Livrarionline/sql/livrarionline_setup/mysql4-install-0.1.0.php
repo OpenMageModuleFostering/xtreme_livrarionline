@@ -24,6 +24,8 @@ CREATE TABLE  IF NOT EXISTS {$this->getTable('livrarionline_carriers')} (
   `name` varchar(255) NOT NULL default '',
   `service_id` int(11) unsigned NOT NULL,
   `shipping_company_id` int(11) unsigned NOT NULL,
+  `flat_fee` DECIMAL(10,2) NULL DEFAULT NULL,
+  `applicable_states` text  NOT NULL,
   `status` smallint(6) NOT NULL default '0',
   `created_time` datetime NULL,
   `updated_time` datetime NULL,
@@ -50,6 +52,7 @@ CREATE TABLE  IF NOT EXISTS {$this->getTable('livrarionline_stores')} (
   `firstname` varchar(255) default NULL,
   `lastname` varchar(255) default NULL,
   `comment` text default NULL,
+  `default` tinyint(1) NOT NULL default '0',
   `status` smallint(6) NOT NULL default '0',
   `created_time` datetime NULL,
   `updated_time` datetime NULL,
@@ -62,6 +65,7 @@ CREATE TABLE  IF NOT EXISTS {$this->getTable('livrarionline_stores')} (
 #DROP TABLE IF EXISTS {$this->getTable('livrarionline_awb')};
 CREATE TABLE  IF NOT EXISTS {$this->getTable('livrarionline_awb')} (
   `awb_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `awb_no` varchar(50) NOT NULL,
   `order_id` int(11) unsigned NOT NULL,
   `service_id` int(11) unsigned NOT NULL,
   `description` text NOT NULL,
@@ -112,5 +116,5 @@ ALTER TABLE {$this->getTable('livrarionline_awb_parcels')}
   ADD CONSTRAINT `FK_AWB_ID` FOREIGN KEY (`awb_id`) REFERENCES {$this->getTable('livrarionline_awb')} (`awb_id`) ON DELETE CASCADE;
 
     ");
-	
+  
 $installer->endSetup(); 
