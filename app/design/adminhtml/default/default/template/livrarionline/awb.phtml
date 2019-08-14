@@ -1,0 +1,230 @@
+<?php 
+	/*print "<pre>"; 
+	print_r($this->getOrder()->getData()); 
+	print "</pre>"; */
+?>
+
+<?php if(preg_match("/^\w+_(\d+)$/", $this->getOrder()->getShippingMethod(), $m)) $service_id = $m[1]; ?>
+<?php $carriers = Mage::getModel('livrarionline/carriers')->toOptionArray(); ?>
+<?php $stores = Mage::getModel('livrarionline/stores')->toOptionArray(); ?>
+<?php $payees = Mage::getModel('livrarionline/payee')->getOptionArray(); ?>
+<?php $parcel_types = Mage::getModel('livrarionline/awb')->getTipColetOptionArray(); ?>
+<?php $parcelcontent_types = Mage::getModel('livrarionline/awb')->getParcelContentOptionArray(); ?>
+
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('LO Create AWB for order #%d', $this->getOrder()->getIncrementId())?></h3></td>
+            <td class="a-right">
+                <button onclick="$('form-button').click();" class="scalable save" type="button"><span><?php echo $this->__('Create AWB'); ?></span></button>
+				<!-- <input onclick="myForm.submit()" class="form-button" id="" type="submit" value="Save" /> -->
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <!-- <form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/save')?>"> -->
+    <form class="awb_form" id="awb_form" name="awb_form" action="<?php echo $this->getUrl('*/*/save')?>" method="post">
+		<div style="position: absolute; width: 300px; right: 100px; margin-top: 40px;">
+			<p><input type="checkbox" name="insurance" value="1" />&nbsp;<?php echo $this->__("Contents insurace") ?></p>
+			<p><input type="checkbox" name="returndocs" value="1" />&nbsp;<?php echo $this->__("Return documents") ?></p>
+			<p><input type="checkbox" name="returndocsbank" value="1" />&nbsp;<?php echo $this->__("Return banking documents") ?></p>
+			<p><input type="checkbox" name="deliveryconf" value="1" />&nbsp;<?php echo $this->__("Delivery confirmation") ?></p>
+			<p><input type="checkbox" name="deliverysat" value="1" />&nbsp;<?php echo $this->__("Delivery on Saturday") ?></p>
+			<p><input type="checkbox" name="emailnotify" value="1" checked />&nbsp;<?php echo $this->__("Email notification") ?></p>
+			<p><input type="checkbox" name="smsnotify" value="1" checked />&nbsp;<?php echo $this->__("SMS notification") ?></p>
+			<p><input type="checkbox" name="deliveryconfmerchant" value="1" checked />&nbsp;<?php echo $this->__("Delivery confirmation merchant") ?></p>
+		</div>
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <input name="order_id" type="hidden" value="<?php echo $this->getOrder()->getId() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Delivery details')?></h4>
+        <fieldset id="my-fieldset1">
+            <table cellspacing="0" class="form-list">
+                <tr>
+                    <td class="label"><?php echo $this->__('Select service')?> <span class="required">*</span></td>
+                    <td class="input-element">
+						<select class="required-entry" name="service_id" id="service_id">
+						<?php foreach($carriers as $carrier): ?>
+							<option value="<?php echo $carrier['value']?>" <?php if (isset($service_id) && $service_id == $carrier['value']) echo "selected" ?>><?php echo $carrier['label']?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Description')?></td>
+                    <td class="input-element"><input class="input-text" name="description" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Reference')?> <span class="required">*</span></td>
+                    <td class="input-element"><input class="input-text required-entry" name="reference" value="<?php echo $this->__("%s - Order Nr. %s", Mage::app()->getStore($this->getOrder()->getStoreId())->getName(), $this->getOrder()->getIncrementId()) ?>" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Declared value')?> <span class="required">*</span></td>
+                    <td class="input-element"><input class="input-text required-entry" name="declared_value" value="<?php echo $this->getOrder()->getGrandTotal() ?>" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('COD')?> <span class="required">*</span></td>
+                    <td class="input-element"><input class="input-text required-entry" name="cod" value="<?php echo $this->getOrder()->getGrandTotal() ?>" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Currency')?> <span class="required">*</span></td>
+                    <td class="input-element"><input class="input-text required-entry" name="currency" value="<?php echo $this->getOrder()->getOrderCurrencyCode() ?>" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Payee?')?> <span class="required">*</span></td>
+                    <td class="input-element">
+						<select class="required-entry" name="payee">
+						<?php foreach($payees as $key => $value): ?>
+							<option value="<?php echo $key?>" <?php if($key == 2) echo "selected" ?> ><?php echo $value ?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Pick up from')?> <span class="required">*</span></td>
+                    <td class="input-element">
+						<select class="required-entry" name="pick_from">
+						<?php foreach($stores as $store): ?>
+							<option value="<?php echo $store['value']?>"><?php echo $store['label']?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+                </tr>
+            </table>
+        </fieldset>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Packages')?></h4>
+        <fieldset id="my-fieldset2">
+			<!--
+			<p>
+				<?php echo $this->__('Number of parcels')?> <span class="required">*</span>
+				<input class="input-text required-entry" name="num_packages" />
+			</p>
+			-->
+			<div class="grid">
+            <table id="table_parcels" cellspacing="0" class="data" style="width:100%;">
+                <tr class="headings">
+                    <th><?php echo $this->__('Parcel type')?></th>
+                    <th><?php echo $this->__('Content')?></th>
+                    <th><?php echo $this->__('Weight (kg)')?></th>
+                    <th><?php echo $this->__('Parcel length (cm)')?></th>
+                    <th><?php echo $this->__('Parcel width (cm)')?></th>
+                    <th><?php echo $this->__('Parcel height (cm)')?></th>
+					<th align="center"></th>
+                </tr>
+                <tr id="parcelrow_0">
+                    <td>
+						<select name="parcels[0][parcel_type]">
+						<?php foreach($parcel_types as $key => $value): ?>
+							<option value="<?php echo $key?>"><?php echo $value ?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+                    <td>
+						<select name="parcels[0][content]">
+						<?php foreach($parcelcontent_types as $key => $value): ?>
+							<option value="<?php echo $key?>"><?php echo $value ?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+                    <td>
+						<input class="input-text" name="parcels[0][weight]" value="<?php echo ($this->getOrder()->getWeight() > 0) ? $this->getOrder()->getWeight() : "1" ?>" />
+					</td>
+                    <td>
+						<input class="input-text " name="parcels[0][length]" value="1" />
+					</td>
+                    <td>
+						<input class="input-text" name="parcels[0][width]" value="1" />
+					</td>
+                    <td>
+						<input class="input-text " name="parcels[0][height]" value="1" />
+					</td>
+                    <td>
+					</td>
+                </tr>
+            </table>
+			</div>
+			<button onclick="addParcel();" class="scalable" type="button"><span><?php echo $this->__('+ Add Parcel') ?></span></button>
+        </fieldset>
+		<input class="form-button" id="form-button" type="submit" value="Save" style="float: right" />
+		<span id="formLoader" style="display:none;">&nbsp;</span>
+    </form>
+	<div id="formSuccess" style="display:none;">&nbsp;</div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+    var formId = 'awb_form';
+    var myForm = new varienForm(formId, 'service_id');
+    var postUrl = '<?php echo $this->getUrl("livrarionline/adminhtml_awb/save/") ?>';
+    function doAjax() {
+        if (myForm.validator.validate()) {
+            new Ajax.Updater(
+                { success:'formSuccess' }, postUrl, {
+                    method:'post',
+                    asynchronous:true,
+                    evalScripts:false,
+                    onComplete:function(request, json) {
+                        Element.hide(formId);
+                        Element.show('formSuccess');
+                    },
+                    onLoading:function(request, json){
+                        Element.show('formLoader');
+                    },
+                    parameters: $(formId).serialize(true),
+                }
+			);
+        }
+    }
+    
+    /*new Event.observe(formId, 'submit', function(e){
+        e.stop();
+        doAjax();
+    });*/
+	function removeParcel(rowid)
+	{
+		jQuery('#' + rowid).remove();
+	}
+	function addParcel()
+	{
+		var row = jQuery('#table_parcels tr:last');
+		var rowid = row.attr('id');
+		var no = rowid.match(/parcelrow_(\d+)/);
+		if(no.length > 0)
+		{
+			var newrowId = parseInt(no[1]) + 1;
+			var rowhtml = 
+			'<tr id="parcelrow_' + newrowId + '">' + 
+                    '<td>' +
+						'<select name="parcels[' + newrowId + '][parcel_type]">' +
+						<?php foreach($parcel_types as $key => $value): ?>
+							'<option value="<?php echo $key?>"><?php echo $value ?></option>' +
+						<?php endforeach; ?>
+						'</select>' +
+					'</td>' +
+                    '<td>' +
+						'<select name="parcels[' + newrowId + '][content]">' +
+						<?php foreach($parcelcontent_types as $key => $value): ?>
+							'<option value="<?php echo $key?>"><?php echo $value ?></option>' +
+						<?php endforeach; ?>
+						'</select>' +
+					'</td>' +
+                    '<td>' +
+						'<input class="input-text" name="parcels[' + newrowId + '][weight]" />' +
+					'</td>' +
+                    '<td>' +
+						'<input class="input-text " name="parcels[' + newrowId + '][length]" />' +
+					'</td>' +
+                    '<td>' +
+						'<input class="input-text" name="parcels[' + newrowId + '][width]" />' +
+					'</td>' +
+                    '<td>' +
+						'<input class="input-text " name="parcels[' + newrowId + '][height]" />' +
+					'</td>' +
+                    '<td align="center">' +
+						'<button onclick="removeParcel(\'parcelrow_' + newrowId + '\');" class="scalable" type="button"><span><?php echo $this->__('Remove') ?></span></button>' +
+					'</td>' +
+                '</tr>';
+			jQuery('#table_parcels tr:last').after(rowhtml);
+		}
+	}
+//]]>
+</script>

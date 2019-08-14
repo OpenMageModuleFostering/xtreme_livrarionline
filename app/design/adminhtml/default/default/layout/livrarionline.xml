@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+<!--     <livrarionline_adminhtml_livrarionline_index>
+        <reference name="content">
+            <block type="livrarionline/adminhtml_livrarionline" name="livrarionline" />
+        </reference>
+    </livrarionline_adminhtml_livrarionline_index>
+ -->    
+	<livrarionline_adminhtml_manageawb_index>
+        <reference name="content">
+            <block type="livrarionline/adminhtml_manageawb" name="manageawb" />
+        </reference>
+    </livrarionline_adminhtml_manageawb_index>
+    <livrarionline_adminhtml_managecarriers_index>
+        <reference name="content">
+            <block type="livrarionline/adminhtml_managecarriers" name="managecarriers" />
+        </reference>
+    </livrarionline_adminhtml_managecarriers_index>
+    <livrarionline_adminhtml_managestores_index>
+        <reference name="content">
+            <block type="livrarionline/adminhtml_managestores" name="managestores" />
+        </reference>
+    </livrarionline_adminhtml_managestores_index>
+    <livrarionline_adminhtml_awb_index>
+		<reference name="head">
+			<action method="addJs"><js>livrarionline/jquery-1.11.1.min.js</js></action>
+			<action method="addJs"><js>livrarionline/jquery.noconflict.js</js></action>
+		</reference>
+        <reference name="content">
+            <!-- <block type="livrarionline/adminhtml_awb_form" name="awb" template="livrarionline/awb.phtml" /> -->
+            <block type="adminhtml/template" name="lo_awb" template="livrarionline/awb.phtml" />
+        </reference>
+    </livrarionline_adminhtml_awb_index>
+	<adminhtml_sales_order_view>
+        <!--
+		<reference name="sales_order_tabs">
+            <action method="addTab">
+				<name>loawb</name>
+				<block>livrarionline/Adminhtml_Sales_Order_View_Tab_Loawb</block>				
+			</action>
+        </reference>
+		-->
+        <reference name="order_tab_info">
+            <action method="setTemplate">
+                <template>livrarionline/order/view/tab/info.phtml</template>
+            </action>
+        </reference>
+      </adminhtml_sales_order_view>	
+</layout>

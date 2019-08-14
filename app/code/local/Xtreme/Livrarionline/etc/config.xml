@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * @category   Xtreme
+ * @package    Xtreme_Livrarionline
+ * @author     ModuleCreator
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+ -->
+<config>
+    <modules>
+        <Xtreme_Livrarionline>
+            <version>0.1.0</version>
+        </Xtreme_Livrarionline>
+    </modules>
+    <frontend>
+        <routers>
+            <livrarionline>
+                <use>standard</use>
+                <args>
+                    <module>Xtreme_Livrarionline</module>
+                    <frontName>livrarionline</frontName>
+                </args>
+            </livrarionline>
+        </routers>
+        <layout>
+            <updates>
+                <livrarionline>
+                    <file>livrarionline.xml</file>
+                </livrarionline>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+			<livrarionline>
+				<use>admin</use>
+				<args>
+					<module>Xtreme_Livrarionline</module>
+					<frontName>loadmin</frontName>
+				</args>
+			</livrarionline>
+        </routers>
+    </admin>
+    <adminhtml>
+		<menu>
+			<livrarionline module="livrarionline">
+				<title>Livrarionline</title>
+				<sort_order>71</sort_order>               
+				<children>
+					<awb module="livrarionline">
+						<title>Manage AWB</title>
+						<sort_order>0</sort_order>
+						<action>livrarionline/adminhtml_manageawb</action>
+					</awb>
+					<carriers module="livrarionline">
+						<title>Manage Carriers</title>
+						<sort_order>2</sort_order>
+						<action>livrarionline/adminhtml_managecarriers</action>
+					</carriers>
+					<stores module="livrarionline">
+						<title>Manage Stores</title>
+						<sort_order>4</sort_order>
+						<action>livrarionline/adminhtml_managestores</action>
+					</stores>
+				</children>
+			</livrarionline>
+		</menu>
+		<acl>
+			<resources>
+<!-- 				<all>
+					<title>Allow Everything</title>
+				</all>
+ -->				<admin>
+					<children>
+						<livrarionline>
+							<title>Livrarionline Module</title>
+							<sort_order>10</sort_order>
+						
+							<children>
+								<awb translate="title" module="livrarionline">
+									<title>Manage AWB</title>
+								</awb>
+								<carriers translate="title"  module="livrarionline">
+									<title>Manage Carriers</title>
+								</carriers>
+								<stores translate="title"  module="livrarionline">
+									<title>Manage Stores</title>
+								</stores>
+							</children>
+				
+						</livrarionline>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<livrarionline>
+					<file>livrarionline.xml</file>
+				</livrarionline>
+			</updates>
+		</layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <livrarionline>
+                <class>Xtreme_Livrarionline_Model</class>
+                <resourceModel>livrarionline_mysql4</resourceModel>
+            </livrarionline>
+            <livrarionline_mysql4>
+                <class>Xtreme_Livrarionline_Model_Mysql4</class>
+                <entities>
+                    <livrarionline>
+                        <table>livrarionline</table>
+                    </livrarionline>
+                </entities>
+                <entities>
+                    <carriers>
+                        <table>livrarionline_carriers</table>
+                    </carriers>
+                </entities>
+                <entities>
+                    <stores>
+                        <table>livrarionline_stores</table>
+                    </stores>
+                </entities>
+                <entities>
+                    <awb>
+                        <table>livrarionline_awb</table>
+                    </awb>
+                </entities>
+                <entities>
+                    <awb_parcels>
+                        <table>livrarionline_awb_parcels</table>
+                    </awb_parcels>
+                </entities>
+            </livrarionline_mysql4>
+        </models>
+        <resources>
+            <livrarionline_setup>
+                <setup>
+                    <module>Xtreme_Livrarionline</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </livrarionline_setup>
+            <livrarionline_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </livrarionline_write>
+            <livrarionline_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </livrarionline_read>
+        </resources>
+        <blocks>
+            <livrarionline>
+                <class>Xtreme_Livrarionline_Block</class>
+            </livrarionline>
+			<adminhtml>
+				<rewrite>
+					<sales_order_view>Xtreme_Livrarionline_Block_Adminhtml_Sales_Order_View</sales_order_view>
+				</rewrite>
+			</adminhtml>
+        </blocks>
+        <helpers>
+            <livrarionline>
+                <class>Xtreme_Livrarionline_Helper</class>
+            </livrarionline>
+        </helpers>
+    </global>
+    <default>
+		<carriers>
+			<livrarionline>
+	            <active>1</active>
+	            <model>livrarionline/carrier_livrarionline</model>
+	            <title>Carrier Title</title>
+	            <name>Method Name</name>
+	            <login_id></login_id>
+	            <security_key></security_key>
+				<specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
+			</livrarionline>
+	    </carriers>
+    </default>
+</config>
