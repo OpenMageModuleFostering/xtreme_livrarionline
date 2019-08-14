@@ -10,7 +10,7 @@
 <config>
     <modules>
         <Xtreme_Livrarionline>
-            <version>0.1.0</version>
+            <version>1.0.2</version>
         </Xtreme_Livrarionline>
     </modules>
     <frontend>
