@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Xtreme_Livrarionline",
+    "name": "OpenMageModuleFostering\/Xtreme_Livrarionline",
     "type": "magento-module",
     "license": "AFL",
     "homepage": "",
     "description": "Livrarionline Shipping Module",
     "authors": [
-    {
-        "name": "Michael Mussulis",
-        "email": "michael@xtreme-vision.net"
-    }
-],
+        {
+            "name": "Michael Mussulis",
+            "email": "michael@xtreme-vision.net"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
